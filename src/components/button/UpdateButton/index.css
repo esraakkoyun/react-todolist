@@ -1,0 +1,8 @@
+.updateButton {
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 10px; /*1.alt üst 2.sağ sol*/
+    margin-right: 5px;
+    font-size: 10px;
+}

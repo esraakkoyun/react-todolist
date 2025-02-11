@@ -1,0 +1,39 @@
+body{
+  background-color: rgb(41, 136, 167);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container{
+  background-color: white;
+  width: 500px;
+  height: 400px;
+
+}
+.title{
+  color: rgb(22, 73, 104);
+  text-align: center;
+  padding-top: 20px;
+}
+.input{
+  border-width: 1;
+  border-color: rgb(10, 105, 168);
+  background-color: white;
+  width: 350px;
+  height: 30px;
+  color: black;
+
+}
+.addContainer{
+  display: flex;
+  flex-direction: row;
+  justify-self: center;
+}
+.addButton{
+  background-color: rgb(41, 136, 167);
+  margin-left: 10px;
+  border-radius: 0%;
+  width: 60px;
+  height: 35px;
+
+}
