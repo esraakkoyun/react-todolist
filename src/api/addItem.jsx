@@ -6,6 +6,7 @@ const addItem = async(newItem) => {
   try{
     const response = await axios.post(BASE_URL, newItem)
     console.log('api eklenen görev:', response.data)
+    
     return response.data
   }
  

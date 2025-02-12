@@ -1,11 +1,10 @@
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios' 
-import  deleteItem  from '../../src/api/deleteItem'
+import api from '../../api/api'
 
 export const deleteList = createAsyncThunk('list/deleteItem', async (id) => { // http isteği yapmak için kullanılır.
   console.log('deleteslice id:',id)
-     await deleteItem(id) // api den gelen veri response a atanır. 
+     await api.deleteItem(id) // api den gelen veri response a atanır. 
     return id // gelen veri döndürülür.
   })
 
@@ -13,8 +12,6 @@ const initialState = { // başlangıç state i
     list: [], // başlangıç state i
     status: 'idle',
   }
-
-
    export const deleteSlice = createSlice({  
       name: 'deleteList',  // slice ismi
       initialState, // başlangıç state i
@@ -33,7 +30,7 @@ const initialState = { // başlangıç state i
                 .addCase(deleteList.rejected, (state, action) => { // veri çekme işlemi başarısız olduğunda. api isteği başarısız olduğunda işlem durumu failed olur.
                     state.status = 'failed' // durum failed olur.
                 })
-      
+                
                 //user da tutulan değeleri çekmek gerekiyor bu da useSelector ile yapılır.
             },
       

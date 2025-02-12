@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
-import { addList } from '../../../../redux/features/add-slice';
+import { addList } from '../../../redux/features/add-slice';
 
 const AddButton = ({buttonName, inputValue}) => {
   const dispatch = useDispatch();
@@ -8,7 +8,7 @@ const AddButton = ({buttonName, inputValue}) => {
   const handleAdd = () => {
     const newItem = {title: inputValue};
     console.log('newItem:', newItem)
-    dispatch(addList(newItem))
+    api.addItem()
   };
 
 

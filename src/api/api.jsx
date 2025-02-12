@@ -1,17 +1,49 @@
-import axios from "axios"
+import axios from "axios";
 
-const BASE_URL = "https://67a4a35cc0ac39787a1bf756.mockapi.io/api/v1/list"
+const applicationJson = "application/json";
 
-const List = async() => {
-  try{
-    const response = await axios.get(BASE_URL)
-    console.log(response)
-    return response.data
+export const API_URL_PROD = "https://67a4a35cc0ac39787a1bf756.mockapi.io/api/v1";
+
+class API {
+  constructor() {
+    this.url = API_URL_PROD;
+
+    // Add a response interceptor
+    axios.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (err) => {
+        return Promise.reject(err);
+      }
+    );
   }
- 
-  catch(error){
-    console.log(error)
-    throw error
+  getSaklabanlık(){
+    console.log("Polat SSB Crudfab")
+  }
+  
+
+  getHeaders() {   
+    return {
+      headers: {
+        "Content-Type": applicationJson,
+      },
+  
+    };
+  }
+  addItem(newTask){
+     return axios.post(`${this.url}/list`,{title:newTask})
+  }
+   
+  getList(){
+    return axios.get(`${this.url}/list`,this.getHeaders())
+  }
+
+  deleteItem(deletedItem){
+    console.log(deletedItem)
+    //{id:5}
+    //5
+    return axios.delete(`${this.url}/list/${deletedItem.id}`,this.getHeaders())
   }
 }
-export default List(); // buraya parantez ekle listslice da ekleme 
+export default new API();
