@@ -1,9 +1,10 @@
-/*import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import axios from 'axios' 
 import  addItem  from '../../src/api/addItem'
 
 export const addList = createAsyncThunk('list/addList', async (newItem) => { // http isteği yapmak için kullanılır.
     const response = await addItem(newItem) // api den gelen veri response a atanır. 
+    console.log('addList görev:', response)
     return response // gelen veri döndürülür.
   })
 
@@ -21,11 +22,13 @@ const initialState = { // başlangıç state i
       },
       extraReducers: (builder) => {
         builder
-          .addCase(addList.pending, (state) => {
+          .addCase(addList.pending, (state,action) => {
             state.status = 'loading';
           })
-          .addCase(addList.fulfilled, (state) => {
+          .addCase(addList.fulfilled, (state,action) => {
             state.status = 'succeeded';
+            state.list.push(action.payload); // yeni eklenen görev listeye eklenir.
+            console.log('payload görev:', action.payload)
           })
           .addCase(addList.rejected, (state, action) => {
             state.status = 'failed';
@@ -38,4 +41,3 @@ const initialState = { // başlangıç state i
 
 // Eğer default export gerekiyorsa şu şekilde olmalı:
 export default addSlice.reducer;
-*/

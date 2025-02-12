@@ -6,27 +6,32 @@ import Api from '../api/api'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchList } from '../../redux/features/list-slice'
 import './index.css'
+import { useState } from 'react'
+import { addList } from '../../redux/features/add-slice'
 
+const IndexPage = ({inputValue}) => {
 
-const IndexPage = () => {
  
+
   const dispatch = useDispatch() 
+
 
   useEffect(() => {
     dispatch(fetchList())
   }, [])
 
+ 
+  
   const {list} = useSelector((state) => state.list) // veri çekmek için 
   console.log(list)
-
 
 
   return (
     <div className='container'>
         <h2 className='title'>TODOLİST</h2>
         <div className='addContainer'>
-            <Input/>
-            <AddButton buttonName="ekle"/>
+            <Input inputValue={inputValue}/>
+            <AddButton buttonName="ekle" />
         </div>
         <div>
 

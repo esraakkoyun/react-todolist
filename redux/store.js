@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import listReducer from './features/list-slice'
-//import addReducer, { addList } from './features/add-slice'
+import addReducer, { addList } from './features/add-slice'
 import deleteReducer, { deleteList } from './features/delete-slice'
 //import updateReducer, { updateList } from './features/update-slice'
 
@@ -8,7 +8,7 @@ import deleteReducer, { deleteList } from './features/delete-slice'
 export const store = configureStore({
   reducer: {
     list: listReducer,
-   // addList: addReducer,
+    addList: addReducer,
     deleteList: deleteReducer,
     //updateList: updateReducer,
 

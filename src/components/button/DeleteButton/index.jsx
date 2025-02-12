@@ -9,7 +9,7 @@ const DeleteButton = ({id}) => {
 
   const handleDelete = () => {
     dispatch(deleteList(id))
-    console.log('deleteindexin id si:',id)
+    console.log('delete button index.jsx id:',id)
   }
 
   const {list} = useSelector((state) => state.list) // veri çekmek için
