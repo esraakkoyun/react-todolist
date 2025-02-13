@@ -8,6 +8,9 @@ import { fetchList } from '../../redux/features/list-slice'
 import './index.css'
 import { useState } from 'react'
 import { addList } from '../../redux/features/add-slice'
+import { use } from 'react'
+import { deleteList } from '../../redux/features/delete-slice'
+import AllCheckButton from '../components/button/AllCheckButton'
 
 const IndexPage = ({inputValue}) => {
 
@@ -18,10 +21,11 @@ const IndexPage = ({inputValue}) => {
 
   useEffect(() => {
     dispatch(fetchList())
-  }, [])
+  }, [dispatch])
 
- 
   
+
+
   const {list} = useSelector((state) => state.list) // veri çekmek için 
   console.log(list)
 
@@ -30,8 +34,9 @@ const IndexPage = ({inputValue}) => {
     <div className='container'>
         <h2 className='title'>TODOLİST</h2>
         <div className='addContainer'>
+          <AllCheckButton/>
             <Input inputValue={inputValue}/>
-            <AddButton buttonName="ekle" />
+            <AddButton buttonName="ekle"  inputValue={inputValue}/>
         </div>
         <div>
 

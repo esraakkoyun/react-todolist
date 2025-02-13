@@ -21,3 +21,17 @@
     align-items: center;
     margin-left: 20px;
 }
+.checkbox{
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+    background-color: white;
+    border-width: 1px;
+    border-color: black;
+    display: flex;
+    align-self: center;
+    font-display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+}

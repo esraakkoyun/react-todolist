@@ -3,12 +3,14 @@ import './index.css'
 import { useDispatch, useSelector } from 'react-redux'
 import  {deleteList}  from '../../../../redux/features/delete-slice'
 import { useEffect } from 'react'
+import { fetchList } from '../../../../redux/features/list-slice'
 
 const DeleteButton = ({id}) => {
   const dispatch = useDispatch() 
 
   const handleDelete = () => {
     dispatch(deleteList(id))
+    dispatch(fetchList())
     console.log('delete button index.jsx id:',id)
   }
 
