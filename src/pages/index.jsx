@@ -24,7 +24,7 @@ const IndexPage = () => {
     if(isChecked){
       setSelectedItemsArray(selectedItemsArray => [...selectedItemsArray,id])
       console.log('seçilen id:' ,id)
-    }else{
+    }else{ //seçili değilse arrayden çıkar
       setSelectedItemsArray(selectedItemsArray.filter((item) => item !== id))
     }
   }
@@ -50,9 +50,9 @@ const IndexPage = () => {
 
   return (
     <div className='container'>
-      <h2 className='title'>TODOLİST</h2>
+      <h2 className='title1'>TODOLİST</h2>
+
       {selectedItemsArray.length > 0 && (
-        
       <div style={{display:'flex',justifyContent:'space-between'}}>
       <AllCheckButton handleAllCheck={handleAllCheck}/>
       <SelectedDelete selectedItemsArray={selectedItemsArray} id={list.id}/>
@@ -62,6 +62,7 @@ const IndexPage = () => {
       <div className='addContainer'>
         <Input />
       </div>
+      
       <div >
         <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox}/>
       </div>

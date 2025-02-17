@@ -8,12 +8,13 @@ const UpdateButton = ({item}) => {
 
   const openModal = () => {
     setShowModal(!showModal)
+    
   }
   
   return (
     <div>
         <button className='updateButton' onClick={openModal} >Update</button>
-        {showModal ?  <Modal setShowModal={setShowModal} item={item} /> : null}
+        {showModal ?  <Modal setShowModal={setShowModal} item={item}/> : null}
     </div>
   )
 }

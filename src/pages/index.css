@@ -1,10 +1,12 @@
-.title{
+.title1{
     color: rgb(22, 73, 104);
     text-align: center;
     padding-top: 20px;
+    font-size: 30px;
+    
   }
   .container{
     background-color: white;
     width: 500px;
-    height: 400px;
+    height: 470px;
   }

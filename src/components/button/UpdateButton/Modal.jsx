@@ -30,7 +30,7 @@ const Modal = ({setShowModal,item}) => {
         }
 
     return (
-      <div className="modal" style={{position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'yellow', padding: '50px', zIndex: 1000}}>
+      <div className="modal" style={styles.modal}>
         <input type="text" value={text} onChange={handleOnChange}/>
         <div>
         <button onClick={closeModal} className="close-button">Close</button>
@@ -38,6 +38,24 @@ const Modal = ({setShowModal,item}) => {
         </div>
       </div>
     );
+  };
+  
+  const styles = {
+    modal: {
+      position: 'fixed',
+      left: '50%', 
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      backgroundColor: 'white',
+      zIndex: 200,
+      width: 300,
+      height: 150,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 20,
+    }
   };
   
 

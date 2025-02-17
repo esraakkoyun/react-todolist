@@ -10,7 +10,6 @@ const handleClick = (e) => {
   handleCheckBox(id,e.target.checked)
 }
 
-
   return (
     <div>
         <input type="checkbox" checked={isChecked} onChange={handleClick}/>

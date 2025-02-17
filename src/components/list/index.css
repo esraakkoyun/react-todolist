@@ -14,14 +14,17 @@
     flex-direction: column;
     max-height: 300px;
     overflow-y: scroll;
+    margin-top: 20px;
 }
 
 .title{
     font-size: 12px;
     font-weight: bold;
-    color: white;
+    color: rgb(22, 73, 104);
     margin-left: 20px;
     margin-top: -5px;
+    text-align: center;
+    padding-top: 20px;
 }
 .buttons{
     display: flex;
