@@ -1,21 +1,29 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux';
-import { addList } from '../../../../redux/features/add-slice';
+import { addList } from '../../../redux/features/add-slice';
 import api from '../../../api/api';
+import { fetchList } from '../../../redux/features/list-slice';
+
 
 const AddButton = ({buttonName, inputValue}) => {
+
+
   const dispatch = useDispatch();
 
-  const handleAdd = () => {
-    const newItem = {title: inputValue || "Varsayılan başlık"};
-    console.log('newItem:', newItem)
-    dispatch(addList(newItem))
-    api.List
-  };
+    const handleTask = () =>{
+      if(inputValue === ''){
+        return alert('Boş bırakılamaz')
+      }
+      else{
+      api.addItem(inputValue).then(()=>{
+       dispatch(fetchList())
+    })}
+      
+    }
 
 
   return (
-    <button className='addButton' onClick={handleAdd}>{buttonName}</button>
+    <button className='addButton' onClick={()=>handleTask()}>{buttonName}</button>
   )
 }
 

@@ -1,49 +1,71 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from '../components/input'
 import AddButton from '../components/button/AddButton'
 import List from '../components/list'
-import Api from '../api/api'
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchList } from '../../redux/features/list-slice'
 import './index.css'
-import { useState } from 'react'
-import { addList } from '../../redux/features/add-slice'
-import { use } from 'react'
-import { deleteList } from '../../redux/features/delete-slice'
+import api from '../api/api'
+import { useDispatch,useSelector } from 'react-redux'
+import { fetchList } from '../redux/features/list-slice'
 import AllCheckButton from '../components/button/AllCheckButton'
+import SelectedDelete from '../components/button/SelectedDelete/SelectedDelete'
 
-const IndexPage = ({inputValue}) => {
-
- 
-
-  const dispatch = useDispatch() 
-
+const IndexPage = () => {  
+  const dispatch = useDispatch();
+  const [selectedItemsArray, setSelectedItemsArray] = useState([])
 
   useEffect(() => {
     dispatch(fetchList())
   }, [dispatch])
 
-  
+  const { list } = useSelector((state) => state.list)
+
+  //seçilenleri arrayde tut 
+  const handleCheckBox = (id,isChecked) => {
+    if(isChecked){
+      setSelectedItemsArray(selectedItemsArray => [...selectedItemsArray,id])
+      console.log('seçilen id:' ,id)
+    }else{
+      setSelectedItemsArray(selectedItemsArray.filter((item) => item !== id))
+    }
+  }
+
+  //seçilenleri array e atıyor mu diye kontrol et  console da göster
+  useEffect(() => {
+    console.log('selectedItemsArray:',selectedItemsArray)
+  }
+  ,[selectedItemsArray]) 
 
 
-  const {list} = useSelector((state) => state.list) // veri çekmek için 
-  console.log(list)
+ 
+//tümünü seç
+  const handleAllCheck = () => {
+    if (selectedItemsArray.length === list.length) { 
+      setSelectedItemsArray([]); // Hepsi seçiliyse, sıfırla
+    } else {
+      setSelectedItemsArray(list.map(item => item.id)); // Tümünü seç
+    }
+  }
+
 
 
   return (
     <div className='container'>
-        <h2 className='title'>TODOLİST</h2>
-        <div className='addContainer'>
-          <AllCheckButton/>
-            <Input inputValue={inputValue}/>
-            <AddButton buttonName="ekle"  inputValue={inputValue}/>
-        </div>
-        <div>
-
-        <List list={list}/>
-      
-        </div>
+      <h2 className='title'>TODOLİST</h2>
+      {selectedItemsArray.length > 0 && (
+        
+      <div style={{display:'flex',justifyContent:'space-between'}}>
+      <AllCheckButton handleAllCheck={handleAllCheck}/>
+      <SelectedDelete selectedItemsArray={selectedItemsArray} id={list.id}/>
       </div>
+      )}
+     
+      <div className='addContainer'>
+        <Input />
+      </div>
+      <div >
+        <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox}/>
+      </div>
+    </div>
   )
 }
 

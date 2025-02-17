@@ -1,9 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios' 
-import  addItem  from '../../src/api/addItem'
+import api from '../../api/api'
 
 export const addList = createAsyncThunk('list/addList', async (newItem) => { // http isteği yapmak için kullanılır.
-    const response = await addItem(newItem) // api den gelen veri response a atanır. 
+    const response = await api.addItem(newItem) // api den gelen veri response a atanır. 
     console.log('addList görev:', response)
     return response // gelen veri döndürülür.
   })

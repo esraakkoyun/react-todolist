@@ -3,24 +3,25 @@ import './index.css'
 import Api from '../../api/api'
 import DeleteButton from '../button/DeleteButton'
 import UpdateButton from '../button/UpdateButton'
-import { useState } from 'react'
-import AllCheckButton from '../button/AllCheckButton'
-import { IoMdCheckmark } from "react-icons/io";
-
-const List = ({list}) => {
+import { useSelector } from 'react-redux'
+import CheckBoxButton from '../button/CheckBoxButton/CheckBoxButton'
 
 
-console.log('list:',list)
+
+
+const List = ({handleCheckBox,selectedItemsArray}) => {
+  const {list} = useSelector((state) => state.list)
+  console.log("list",list)
   return (
-    <div>   
-     {list.length > 0 ? ( list.map((item) => (
-
+    <div className='list-container'>   
+     
+     {list? (list.map((item) => (
         <div key={item.id} className='list'>
-          
+          <CheckBoxButton id={item.id} selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox} />
           <p className='title'>{item.title}</p>
           <div className='buttons'>
           <DeleteButton id={item.id}/>
-          <UpdateButton/>
+          <UpdateButton item={item}/>
           </div>
       
         </div>

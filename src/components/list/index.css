@@ -1,13 +1,21 @@
-.list{
+.list {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     width: 400px;
     height: 50px;
     margin-top: 10px;
-    margin-left: 48px;
     background-color: rgb(123, 218, 239);
+   
 }
+.list-container{
+    display: flex;
+    flex-direction: column;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
 .title{
     font-size: 12px;
     font-weight: bold;
