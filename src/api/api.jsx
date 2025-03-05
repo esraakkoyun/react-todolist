@@ -53,5 +53,7 @@ class API {
     console.log("api id ve text:",id,text)
     return axios.put(`${this.url}/list/${id}`,{title:text},this.getHeaders())
   }
+
+
 }
 export default new API();

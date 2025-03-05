@@ -4,6 +4,8 @@ import AllCheckButton from '../AllCheckButton'
 
 const CheckBoxButton = ({id,selectedItemsArray,handleCheckBox}) => {
   const isChecked = selectedItemsArray.includes(id); // Checkbox'ın seçili olup olmadığını kontrol et.
+
+  
   
 const handleClick = (e) => {
   console.log('seçildi')

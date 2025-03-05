@@ -8,8 +8,9 @@ import { useDispatch,useSelector } from 'react-redux'
 import { fetchList } from '../redux/features/list-slice'
 import AllCheckButton from '../components/button/AllCheckButton'
 import SelectedDelete from '../components/button/SelectedDelete/SelectedDelete'
+import Logout from '../components/button/Logout'
 
-const IndexPage = () => {  
+const IndexPage = ({onLogout}) => {  
   const dispatch = useDispatch();
   const [selectedItemsArray, setSelectedItemsArray] = useState([])
 
@@ -65,6 +66,9 @@ const IndexPage = () => {
       
       <div >
         <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox}/>
+      </div>
+      <div>
+        <Logout onLogout={onLogout}/>
       </div>
     </div>
   )
