@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import KayitOl from '../Signup'
+import { useDispatch } from 'react-redux';
+import { fetchList } from '../redux/features/list-slice';
 
 const Login = ({ onLogin, onRegister }) => {
     const [username, setUsername] = useState('')
@@ -33,13 +35,15 @@ const Login = ({ onLogin, onRegister }) => {
                 body: JSON.stringify({ username, password }),  //kullanıcı adı ve şifreyi backende json formatında gönderir
             });
   
+            
             const data = await response.json();  //response'ı json formatında alır
-  
+
             if (response.ok) {  //response'ın ok olup olmadığını kontrol eder
-                localStorage.setItem('token', data.access_token);
-                console.log(data.access_token);
+                //localStorage.setItem('token', data.access_token);
+                localStorage.setItem('userId', data.userId); // kullanıcı girişi yapıldığında userId'yi localStorage'e kaydeder bunu verileri çekmek için kullanırız.
+               // console.log(data.access_token);
+                localStorage.setItem('userName', data.username);
                 setMessage('Giriş yapıldı');
-                console.log('Giriş yapıldı');
                 onLogin(); 
             } else {
                 setMessage(data.detail || 'Geçersiz kullanıcı adı veya şifre');
@@ -50,6 +54,17 @@ const Login = ({ onLogin, onRegister }) => {
             console.error('Bir hata oluştu:', error);
         }
     }
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        const userId = localStorage.getItem('userId'); // kullanıcı id'si alınır
+        console.log('pages userId:', userId);
+        if (userId) {
+            dispatch(fetchList(userId)); // kullanıcı id'si gönderilir ve o id'ye ait görevleri getirir
+        } else {
+            console.log('userId bulunamadı');
+        }
+    }, [dispatch]);
 
 
   return (

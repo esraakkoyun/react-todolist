@@ -31,13 +31,16 @@ class API {
   
     };
   }
-  //veri eklemek için
+  //veri eklemek için - kullanıcıya göre ekleme yapıyorux
   addItem(newTask){
-     return axios.post(`${this.url}/list`,{title:newTask}) 
+    const userId = localStorage.getItem('userId');
+    console.log("api add userId:",userId)
+     return axios.post(`${this.url}/list`,{title:newTask,userId:userId},this.getHeaders()) 
   }
-   //veri getirmek için
-  getList(){
-    return axios.get(`${this.url}/list`,this.getHeaders())
+   // görev verilerini getirmek için
+   getList(){
+    const userId = localStorage.getItem('userId');
+    return axios.get(`${this.url}/list?userId=${userId}`, this.getHeaders()); // userId'yi alır ve o id'ye ait görevleri getirir
   }
 
   //veri silmek için
@@ -45,13 +48,14 @@ class API {
     console.log(id)
     //{id:5}
     //5
-    return axios.delete(`${this.url}/list/${id}`,this.getHeaders())
+    return axios.delete(`${this.url}/list/${id}`,this.getHeaders()) 
   }
 
   //veri güncellemek için
   updateItem(id,text){
+    const userId = localStorage.getItem('userId');
     console.log("api id ve text:",id,text)
-    return axios.put(`${this.url}/list/${id}`,{title:text},this.getHeaders())
+    return axios.put(`${this.url}/list/${id}`,{title:text,userId:userId},this.getHeaders())
   }
 
 

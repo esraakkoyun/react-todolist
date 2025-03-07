@@ -15,7 +15,14 @@ const IndexPage = ({onLogout}) => {
   const [selectedItemsArray, setSelectedItemsArray] = useState([])
 
   useEffect(() => {
-    dispatch(fetchList())
+    const userId = localStorage.getItem('userId'); // kullanıcı id si alınır
+    console.log(' pages userId:',userId)
+    if(userId){
+      dispatch(fetchList(userId)) // kullanıcı id si gönderilir ve o id'ye ait görevleri getirir
+    }
+    else{
+      console.log('userId bulunamadı')
+    }
   }, [dispatch])
 
   const { list } = useSelector((state) => state.list)
@@ -47,11 +54,13 @@ const IndexPage = ({onLogout}) => {
     }
   }
 
+  const userName = localStorage.getItem('userName');
 
 
   return (
     <div className='container'>
       <h2 className='title1'>TODOLİST</h2>
+      <h5>Hoşgeldiniz {userName}</h5> 
 
       {selectedItemsArray.length > 0 && (
       <div style={{display:'flex',justifyContent:'space-between'}}>
@@ -64,8 +73,13 @@ const IndexPage = ({onLogout}) => {
         <Input />
       </div>
       
-      <div >
-        <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox}/>
+      <div > 
+      {list.length === 0 ? (
+            <p>Liste boş. Görev ekleyin!</p>
+        ) : (
+            <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox} />
+        )}
+
       </div>
       <div>
         <Logout onLogout={onLogout}/>

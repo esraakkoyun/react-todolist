@@ -1,4 +1,6 @@
-import React , {useState} from 'react'
+import React , {useEffect, useState} from 'react'
+import { useDispatch } from 'react-redux';
+import { fetchList } from '../redux/features/list-slice';
 
 const KayitOl = ({onRegister}) => {
     const [username, setUsername] = useState('');
@@ -30,6 +32,8 @@ const KayitOl = ({onRegister}) => {
             const data = await response.json();  //response'ı json formatında alır
   
             if (response.ok) {
+                localStorage.setItem('userId', data.userId); // kullanıcı kayıt olduğunda userId'yi localStorage'e kaydeder bunu verileri çekmek için kullanırız.
+                //localStorage.setItem('access_token', data.access_token); // kullanıcı kayıt olduğunda access_token'ı localStorage'e kaydeder bunu verileri çekmek için kullanırız.
                 setMessage('Kullanıcı kaydedildi');
                 console.log('Kullanıcı kaydedildi');
             }
@@ -43,6 +47,16 @@ const KayitOl = ({onRegister}) => {
         }
         onRegister();
     }
+
+
+    const dispatch = useDispatch();
+    useEffect(() => {
+        const userId = localStorage.getItem('userId'); // kullanıcı id'si alınır
+        console.log('pages userId:', userId);
+        if (userId) {
+            dispatch(fetchList(userId)); // kullanıcı id'si gönderilir ve o id'ye ait görevleri getirir
+        }
+    }, [dispatch]);
 
 
     

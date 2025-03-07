@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { useDispatch } from 'react-redux';
-import { addList } from '../../../redux/features/add-slice';
 import api from '../../../api/api';
 import { fetchList } from '../../../redux/features/list-slice';
 
