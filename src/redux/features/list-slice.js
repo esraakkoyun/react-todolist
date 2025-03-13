@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import api from '../../api/api'
 
-export const fetchList = createAsyncThunk('list/fetchList', async () => { // http isteği yapmak için kullanılır.
+export const fetchList = createAsyncThunk('gettasks/fetchList', async () => { // http isteği yapmak için kullanılır.
     const response = await api.getList() // api den gelen veri response a atanır. 
     return response.data // gelen veri döndürülür.
   })
 
 const initialState = { // başlangıç state i
-    list: [], // başlangıç state i
+    list: [], // başlangıç state i+
     status: 'idle', // başlangıç state i
   }
 

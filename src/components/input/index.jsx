@@ -25,7 +25,7 @@ const Input = () => {
     />
     
     
-    <AddButton buttonName="ekle" inputValue={inputValue}/> 
+    <AddButton buttonName="ekle" inputValue={inputValue} /> 
     </div>
   )
 }

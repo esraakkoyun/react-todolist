@@ -16,6 +16,7 @@ const AddButton = ({buttonName, inputValue}) => {
       else{
       api.addItem(inputValue).then(()=>{
        dispatch(fetchList())
+       console.log("addbutton:",inputValue)
     })}
       
     }

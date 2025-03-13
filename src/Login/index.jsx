@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react'
 import KayitOl from '../Signup'
 import { useDispatch } from 'react-redux';
 import { fetchList } from '../redux/features/list-slice';
+import api from '../api/api';
+import {  loginUser } from '../redux/features/user-slice';
 
 const Login = ({ onLogin, onRegister }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
     const [isRegister, setIsRegister] = useState(false);
+
+    const dispatch = useDispatch();
 
     const handleUSerName = (e) => {
         setUsername(e.target.value)
@@ -21,50 +25,28 @@ const Login = ({ onLogin, onRegister }) => {
         setIsRegister(true);
     }
 
-    const handleLogin = async() => { 
-        if (username === '' || password === '') {  // Kullanıcı adı ve şifre kontrolü
+    const handleLogin = async () => {
+        if (username === '' || password === '') {
             setMessage('Kullanıcı adı ve şifre boş olamaz');
             return;
         }
-        try {
-            const response = await fetch('http://127.0.0.1:8000/login', {  //bu fonksiyon kullanıcı adı ve şifreyi backende gönderir
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),  //kullanıcı adı ve şifreyi backende json formatında gönderir
-            });
-  
-            
-            const data = await response.json();  //response'ı json formatında alır
-
-            if (response.ok) {  //response'ın ok olup olmadığını kontrol eder
-                //localStorage.setItem('token', data.access_token);
-                localStorage.setItem('userId', data.userId); // kullanıcı girişi yapıldığında userId'yi localStorage'e kaydeder bunu verileri çekmek için kullanırız.
-               // console.log(data.access_token);
-                localStorage.setItem('userName', data.username);
-                setMessage('Giriş yapıldı');
-                onLogin(); 
-            } else {
-                setMessage(data.detail || 'Geçersiz kullanıcı adı veya şifre');
-                console.log(data.detail || 'Geçersiz kullanıcı adı veya şifre');
+        api.user_login(username, password)
+        .then((response) => {
+            if (response.status === 200) {
+                const {token, username,id} = response.data;
+                dispatch(loginUser({token, username}));
+                console.log("Giriş başarılı", {token, username});
+                setMessage('Giriş başarılı');
+                onLogin();
+                return;
             }
-        } catch (error) {
-            setMessage('Bir hata oluştu');
-            console.error('Bir hata oluştu:', error);
-        }
+            else {
+                console.log("Giriş başarısız")
+                setMessage('Giriş başarısız');
+            }
+            
+        })
     }
-
-    const dispatch = useDispatch();
-    useEffect(() => {
-        const userId = localStorage.getItem('userId'); // kullanıcı id'si alınır
-        console.log('pages userId:', userId);
-        if (userId) {
-            dispatch(fetchList(userId)); // kullanıcı id'si gönderilir ve o id'ye ait görevleri getirir
-        } else {
-            console.log('userId bulunamadı');
-        }
-    }, [dispatch]);
 
 
   return (

@@ -13,17 +13,12 @@ import Logout from '../components/button/Logout'
 const IndexPage = ({onLogout}) => {  
   const dispatch = useDispatch();
   const [selectedItemsArray, setSelectedItemsArray] = useState([])
-
+  const [todolist, setTodolist] = useState([])
+ 
   useEffect(() => {
-    const userId = localStorage.getItem('userId'); // kullanıcı id si alınır
-    console.log(' pages userId:',userId)
-    if(userId){
-      dispatch(fetchList(userId)) // kullanıcı id si gönderilir ve o id'ye ait görevleri getirir
-    }
-    else{
-      console.log('userId bulunamadı')
-    }
-  }, [dispatch])
+    dispatch(fetchList());
+  },[dispatch]);
+
 
   const { list } = useSelector((state) => state.list)
 
@@ -43,7 +38,6 @@ const IndexPage = ({onLogout}) => {
   }
   ,[selectedItemsArray]) 
 
-
  
 //tümünü seç
   const handleAllCheck = () => {
@@ -54,6 +48,8 @@ const IndexPage = ({onLogout}) => {
     }
   }
 
+
+  
   const userName = localStorage.getItem('userName');
 
 
@@ -70,7 +66,7 @@ const IndexPage = ({onLogout}) => {
       )}
      
       <div className='addContainer'>
-        <Input />
+        <Input/>
       </div>
       
       <div > 

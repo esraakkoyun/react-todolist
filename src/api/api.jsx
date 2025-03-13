@@ -2,7 +2,8 @@ import axios from "axios";
 
 const applicationJson = "application/json";
 
-export const API_URL_PROD = "https://67a4a35cc0ac39787a1bf756.mockapi.io/api/v1";
+export const API_URL_PROD = "http://localhost:8000"; // FastAPI sunucun burada çalışmalı
+
 
 class API {
   constructor() {
@@ -24,23 +25,24 @@ class API {
   
 
   getHeaders() {   
+    const token = localStorage.getItem("token"); // Token'ı localStorage'dan al
     return {
       headers: {
         "Content-Type": applicationJson,
+        Authorization: `Bearer ${token}`, // Token'ı ekleyelim
+        
       },
   
     };
   }
   //veri eklemek için - kullanıcıya göre ekleme yapıyorux
   addItem(newTask){
-    const userId = localStorage.getItem('userId');
-    console.log("api add userId:",userId)
-     return axios.post(`${this.url}/list`,{title:newTask,userId:userId},this.getHeaders()) 
+    console.log("api addITem:",newTask)
+     return axios.post(`${this.url}/addtasks`,{title:newTask},this.getHeaders()) 
   }
    // görev verilerini getirmek için
    getList(){
-    const userId = localStorage.getItem('userId');
-    return axios.get(`${this.url}/list?userId=${userId}`, this.getHeaders()); // userId'yi alır ve o id'ye ait görevleri getirir
+    return axios.get(`${this.url}/gettasks`, this.getHeaders());
   }
 
   //veri silmek için
@@ -48,16 +50,27 @@ class API {
     console.log(id)
     //{id:5}
     //5
-    return axios.delete(`${this.url}/list/${id}`,this.getHeaders()) 
+    return axios.delete(`${this.url}/deletetasks/${id}`,this.getHeaders()) 
   }
 
   //veri güncellemek için
   updateItem(id,text){
-    const userId = localStorage.getItem('userId');
-    console.log("api id ve text:",id,text)
-    return axios.put(`${this.url}/list/${id}`,{title:text,userId:userId},this.getHeaders())
+ 
+    return axios.put(`${this.url}/updatetasks/${id}`,{title:text},this.getHeaders())
   }
 
+  // Kullanıcı kaydı
+  user_register(username, password) {
+    return axios.post(`${this.url}/register`, { username, password }, this.getHeaders());
+  }
+
+  // Kullanıcı girişi
+  user_login(username, password) {
+    return axios.post(`${this.url}/login`, { username, password }, this.getHeaders());
+  }
+
+ 
+  
 
 }
 export default new API();
