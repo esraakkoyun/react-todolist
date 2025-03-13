@@ -142,136 +142,89 @@ def get_user_id_from_token(token: str = Depends(oauth2_scheme)):
 # Kullanıcıya ait görevleri almak
 @app.get("/gettasks")
 async def get_tasks(user_id: int = Depends(get_user_id_from_token)):
-    query = "SELECT id, title FROM todolist WHERE user_id = :user_id"
-    tasks = await database.fetch_all(query=query, values={"user_id": user_id})
-    return tasks 
+    query = "SELECT todolist FROM users WHERE id = :user_id"
+    user = await database.fetch_one(query=query, values={"user_id": user_id})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    # JSON olarak saklanan görevleri çözüp döndür
+    return json.loads(user["todolist"]) if user["todolist"] else []
+
 
 # Yeni görev ekleme
 
 @app.post("/addtasks")
 async def add_task(task: TaskRequest, user_id: int = Depends(get_user_id_from_token)):
-    query = """
-    INSERT INTO todolist (title, user_id)
-    VALUES (:title, :user_id)
-    RETURNING id;
-    """
-    values = {"title": task.title, "user_id": user_id}
-    task_id = await database.execute(query=query, values=values)
-    return {"taskId": task_id}
+    # Mevcut todolist'i al
+    query = "SELECT todolist FROM users WHERE id = :user_id"
+    user = await database.fetch_one(query=query, values={"user_id": user_id})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    # Mevcut listeyi JSON olarak çözümle
+    todolist = json.loads(user["todolist"]) if user["todolist"] else []
+
+    # Yeni görevin id'sini belirle
+    new_id = max([task["id"] for task in todolist], default=0) + 1  # Eğer liste boşsa id'yi 1 yap
+
+    # Yeni görevi oluştur
+    new_task = {"id": new_id, "title": task.title}
+    todolist.append(new_task)
+
+    # Güncellenmiş listeyi JSON olarak kaydet
+    update_query = "UPDATE users SET todolist = :todolist WHERE id = :user_id"
+    await database.execute(query=update_query, values={"todolist": json.dumps(todolist), "user_id": user_id})
+
+    return {"message": "Görev eklendi", "todolist": todolist}
+
+
 
 
 # Görevi güncelleme
 @app.put("/updatetasks/{task_id}")
-async def update_task(task_id: int, task: UpdateTaskRequest, user_id: int = Depends(get_user_id_from_token)):
-    query = "UPDATE todolist SET title = :title WHERE id = :task_id AND user_id = :user_id"
-    values = {"title": task.title, "task_id": task_id, "user_id": user_id}
-    await database.execute(query=query, values=values)
-    return {"taskId": task_id}
+async def update_task(task_id: int, updated_task: dict, user_id: int = Depends(get_user_id_from_token)):
+    query = "SELECT todolist FROM users WHERE id = :user_id"
+    user = await database.fetch_one(query=query, values={"user_id": user_id})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    todolist = json.loads(user["todolist"]) if user["todolist"] else []
+
+    # ID'ye göre görevi bul ve güncelle
+    for task in todolist:
+        if task["id"] == task_id:
+            task["title"] = updated_task["title"]  # title güncelleniyor
+
+    # Güncellenen listeyi veritabanına kaydet
+    update_query = "UPDATE users SET todolist = :todolist WHERE id = :user_id"
+    await database.execute(query=update_query, values={"todolist": json.dumps(todolist), "user_id": user_id})
+
+    return {"message": "Görev güncellendi", "todolist": todolist}
+
+
 
 
 # Görevi silme
 @app.delete("/deletetasks/{task_id}")
 async def delete_task(task_id: int, user_id: int = Depends(get_user_id_from_token)):
-    query = "DELETE FROM todolist WHERE id = :task_id AND user_id = :user_id"
-    values = {"task_id": task_id, "user_id": user_id}
-    task_id = await database.execute(query=query, values=values)
-    return {"taskId": task_id}
+    query = "SELECT todolist FROM users WHERE id = :user_id"
+    user = await database.fetch_one(query=query, values={"user_id": user_id})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    todolist = json.loads(user["todolist"]) if user["todolist"] else []
+
+    # ID'ye göre görevi sil
+    todolist = [task for task in todolist if task["id"] != task_id]
+
+    update_query = "UPDATE users SET todolist = :todolist WHERE id = :user_id"
+    await database.execute(query=update_query, values={"todolist": json.dumps(todolist), "user_id": user_id})
+
+    return {"message": "Görev silindi", "todolist": todolist}
 
 
 
-
-"""
-import requests  # httpx yerine requests kullanıyoruz
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import jwt
-import datetime
-
-SECRET_KEY = "your-secret-key"
-
-
-def create_token(user_id: str):
-    payload = {
-        "user_id": user_id,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)  # Token 1 saat geçerli
-    }
-    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-
-def verify_token(token: str):
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-        return payload["user_id"]
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token süresi dolmuş")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Geçersiz token")
-
-
-
-app = FastAPI()
-
-# CORS Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class LoginRequest(BaseModel):
-    username: str
-    password: str
-
-# Mock API URL
-USERS_URL = "https://67a4a35cc0ac39787a1bf756.mockapi.io/api/v1/users"
-
-
-@app.get("/")
-def get_users():
-    response = requests.get(USERS_URL)  # Senkron istek
-    return response.json()
-
-@app.post("/login")
-def login(data: LoginRequest):
-    response = requests.get(USERS_URL)  # Tüm kullanıcıları al
-    users = response.json()  # Kullanıcıları JSON formatında al
-
-    # Kullanıcı adı ve şifre kontrolü
-    for user in users:
-        if user['username'] == data.username and user['password'] == data.password:
-             token = create_token(user["id"])  # Token oluştur
-            return {"userId": user["id"], "username": user["username"], "token": token}  # Token'ı döndür
-    raise HTTPException(status_code=401, detail="Kullanıcı adı veya şifre yanlış")
-
-
-@app.post("/register")
-def register(data: LoginRequest):
-    # Kullanıcı adı zaten mevcut mu kontrol et
-    response = requests.get(USERS_URL)  # Tüm kullanıcıları al
-    users = response.json()  # Kullanıcıları JSON formatında al
-
-    for user in users:
-        if user['username'] == data.username:
-            raise HTTPException(status_code=400, detail="Kullanıcı zaten mevcut")
-
-    # Mock API'ye kullanıcı kaydetme isteği
-    response = requests.post(USERS_URL, json={
-        "username": data.username,
-        "password": data.password
-    })
-
-    if response.status_code == 201:  # 201: kayıt başarılı
-        new_user = response.json()  # Yeni kullanıcıyı al
-        token = create_token(new_user["id"])  # Token oluştur
-        return {"userId": new_user["id"], "username": new_user["username"], "token": token}  # Token'ı döndür
-    else:
-        raise HTTPException(status_code=response.status_code, detail="Kullanıcı kaydedilemedi")
-    
-
-        
-
-
-
-"""
