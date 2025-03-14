@@ -35,6 +35,7 @@ class API {
   
     };
   }
+
   //veri eklemek için - kullanıcıya göre ekleme yapıyorux
   addItem(newTask){
     console.log("api addITem:",newTask)
@@ -68,6 +69,12 @@ class API {
   user_login(username, password) {
     return axios.post(`${this.url}/login`, { username, password }, this.getHeaders());
   }
+
+    // Kullanıcı bilgilerini almak için
+    getUserById() {
+      return axios.get(`${this.url}/getUserById`, this.getHeaders());
+    }  
+  
 
  
   

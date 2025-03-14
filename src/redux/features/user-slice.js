@@ -1,14 +1,17 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-
+import api from '../../api/api'
 
 
 export const fetchUser = createAsyncThunk('user/fetchUser', async () => { // http isteği yapmak için kullanılır.
-  const response = await api.getUser() // api den gelen veri response a atanır. 
+  const response = await api.getUserById() // api den gelen veri response a atanır. 
   return response.data // gelen veri döndürülür.
 })
 
 const initialState = {
-  user: null,
+  user: localStorage.getItem('token') ? {
+    token: localStorage.getItem('token'),
+    username: localStorage.getItem('username'),
+  } : null,
 };
 
 const userSlice = createSlice({

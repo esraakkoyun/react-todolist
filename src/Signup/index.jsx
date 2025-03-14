@@ -2,11 +2,13 @@ import React , {useEffect, useState} from 'react'
 import { useDispatch } from 'react-redux';
 import { fetchList } from '../redux/features/list-slice';
 import api from '../api/api';
+import Login from '../Login';
 
-const KayitOl = ({onRegister}) => {
+const KayitOl = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [isLogin,setIsLogin] = useState(false);
 
     const handleUsernameChange = (e) => {
         setUsername(e.target.value);
@@ -28,7 +30,8 @@ const KayitOl = ({onRegister}) => {
         if (response.status === 200) {
             console.log('Kayıt başarılı', response.data);
             setMessage('Kayıt başarılı');
-            onRegister();
+            alert('kayıt başarılı şimdi giriş yapın')
+            setIsLogin(true);
             return;
         }
         else {
@@ -40,12 +43,19 @@ const KayitOl = ({onRegister}) => {
     
         
   return (
-    <div>
+    <>
+    {isLogin ? (
+        <Login/>
+    ) : (
+     <div>
         <h1>Kayıt Ol</h1>
         <input type="text" placeholder="Kullanıcı Adı" value={username} onChange={handleUsernameChange}/>
         <input type="password" placeholder="Şifre" value={password} onChange={handlePasswordChange}/>
         <button onClick={handleKayitol}>Kayıt Ol</button>
     </div>
+      )}
+    </>
+   
   )
 }
 

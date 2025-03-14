@@ -1,31 +1,28 @@
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './App.css'
 import Login from './Login';
 import IndexPage from './pages'
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from 'react';
+import { logoutUser } from './redux/features/user-slice';
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  }
+  
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
+
   const handleLogout = () => {
-    setIsLoggedIn(false);
-  }
-  const handleRegister = () => {
-    setIsLoggedIn(true);
-  }
-
-  const user = useSelector((state) => state.user);
+    dispatch(logoutUser());
+  };
 
 
+  
   return (
     <>
-     {isLoggedIn ? ( // Giriş durumu kontrolü
+     {user ? ( // Giriş durumu kontrolü
                 <IndexPage onLogout={handleLogout} />
             ) : (
-                <Login onLogin={handleLogin} onRegister={handleRegister} /> // Giriş bileşenine prop geç
+                <Login /> // Giriş bileşenine prop geç
             )}
     </>
   )

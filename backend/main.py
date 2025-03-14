@@ -124,8 +124,6 @@ def create_token(user_id: str):
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
-
-
 # OAuth2PasswordBearer ile token doğrulaması
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 # Token doğrulama fonksiyonu
@@ -228,3 +226,17 @@ async def delete_task(task_id: int, user_id: int = Depends(get_user_id_from_toke
 
 
 
+# Kullanıcıya ait görevleri almak
+@app.get("/getUserById")
+async def get_user_by_id(user_id: int = Depends(get_user_id_from_token)):
+    query = "SELECT * FROM users WHERE id = :user_id"
+    user = await database.fetch_one(query=query, values={"user_id": user_id})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+
+    return {
+        "id": user["id"],
+        "username": user["username"],
+        "todolist": json.loads(user["todolist"])  # Kullanıcının todolist'ini döndür
+    }

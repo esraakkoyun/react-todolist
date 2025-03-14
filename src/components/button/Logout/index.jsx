@@ -9,7 +9,6 @@ const Logout = ({onLogout}) => {
  
 
   const handleLogout = () => {
-    dispatch(logoutUser());
     onLogout();
 
   }

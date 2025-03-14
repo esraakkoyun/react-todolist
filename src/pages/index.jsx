@@ -13,11 +13,13 @@ import Logout from '../components/button/Logout'
 const IndexPage = ({onLogout}) => {  
   const dispatch = useDispatch();
   const [selectedItemsArray, setSelectedItemsArray] = useState([])
-  const [todolist, setTodolist] = useState([])
- 
+  
+
+
   useEffect(() => {
     dispatch(fetchList());
   },[dispatch]);
+
 
 
   const { list } = useSelector((state) => state.list)
@@ -50,13 +52,15 @@ const IndexPage = ({onLogout}) => {
 
 
   
-  const userName = localStorage.getItem('userName');
+
+
+
+
 
 
   return (
     <div className='container'>
       <h2 className='title1'>TODOLİST</h2>
-      <h5>Hoşgeldiniz {userName}</h5> 
 
       {selectedItemsArray.length > 0 && (
       <div style={{display:'flex',justifyContent:'space-between'}}>

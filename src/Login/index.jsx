@@ -5,7 +5,7 @@ import { fetchList } from '../redux/features/list-slice';
 import api from '../api/api';
 import {  loginUser } from '../redux/features/user-slice';
 
-const Login = ({ onLogin, onRegister }) => {
+const Login = () => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [message, setMessage] = useState('')
@@ -37,7 +37,7 @@ const Login = ({ onLogin, onRegister }) => {
                 dispatch(loginUser({token, username}));
                 console.log("Giriş başarılı", {token, username});
                 setMessage('Giriş başarılı');
-                onLogin();
+              
                 return;
             }
             else {
@@ -52,7 +52,7 @@ const Login = ({ onLogin, onRegister }) => {
   return (
     <>
     {isRegister ? (
-        <KayitOl onRegister={onRegister}/>
+        <KayitOl />
     ) : (
         <>
         <h1>Login</h1>
