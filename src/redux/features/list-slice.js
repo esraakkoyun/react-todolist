@@ -11,7 +11,6 @@ const initialState = { // başlangıç state i
     status: 'idle', // başlangıç state i
   }
 
-
    export const listSlice = createSlice({  
       name: 'list',  // slice ismi
       initialState, // başlangıç state i

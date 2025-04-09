@@ -1,0 +1,15 @@
+.deleteSelectedButton {
+    background-color: red; /* Buton arka plan rengi */
+    color: white; /* Buton metin rengi */
+    border: none; /* Kenar yok */
+    padding: 10px 15px; /* İç boşluk */
+    font-size: 11px; /* Font boyutu */
+    border-radius: 5px; /* Kenar yuvarlama */
+    cursor: pointer; /* İmleç değişimi */
+    transition: background-color 0.3s; /* Geçiş efekti */
+    margin-top: 5px;
+}
+
+.deleteSelectedButton:hover {
+    background-color: darkred; /* Hover durumunda arka plan rengi */
+}

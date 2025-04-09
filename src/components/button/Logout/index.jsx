@@ -1,22 +1,17 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { clearList } from '../../../redux/features/clear-list';
-import { logoutUser } from '../../../redux/features/user-slice';
-
-const Logout = ({onLogout}) => {
-  const dispatch = useDispatch();
- 
-
+import React from "react";
+import "./index.css";
+const Logout = ({ onLogout }) => {
   const handleLogout = () => {
     onLogout();
-
-  }
+  };
   return (
     <div>
-        <button onClick={handleLogout}> Çıkış Yap</button>
-    </div> 
-  )
-}
+      <button className="logoutButton" onClick={handleLogout}>
+        {" "}
+        Çıkış Yap
+      </button>
+    </div>
+  );
+};
 
-export default Logout
+export default Logout;

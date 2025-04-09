@@ -5,8 +5,20 @@
     font-size: 30px;
     
   }
-  .container{
-    background-color: white;
-    width: 500px;
-    height: 470px;
+  .list-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 40vh;
+    overflow-y: auto; /* Taşma durumunda kaydırma */
+    margin-top: 20px;
+  }
+  
+  .list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(123, 218, 239);
+    border-radius: 5px; /* Kenar yuvarlama */
+    padding: 10px; /* İç boşluk */
+    margin: 5px 0; /* Dikey boşluk */
   }

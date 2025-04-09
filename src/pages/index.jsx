@@ -1,91 +1,87 @@
-import React, { useEffect, useState } from 'react'
-import Input from '../components/input'
-import AddButton from '../components/button/AddButton'
-import List from '../components/list'
-import './index.css'
-import api from '../api/api'
-import { useDispatch,useSelector } from 'react-redux'
-import { fetchList } from '../redux/features/list-slice'
-import AllCheckButton from '../components/button/AllCheckButton'
-import SelectedDelete from '../components/button/SelectedDelete/SelectedDelete'
-import Logout from '../components/button/Logout'
+import React, { useEffect, useState } from "react";
+import Input from "../components/input";
+import AddButton from "../components/button/AddButton";
+import List from "../components/list";
+import "./index.css";
+import api from "../api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchList } from "../redux/features/list-slice";
+import AllCheckButton from "../components/button/AllCheckButton";
+import SelectedDelete from "../components/button/SelectedDelete/SelectedDelete";
+import Logout from "../components/button/Logout";
 
-const IndexPage = ({onLogout}) => {  
+const IndexPage = ({ onLogout, notify }) => {
   const dispatch = useDispatch();
-  const [selectedItemsArray, setSelectedItemsArray] = useState([])
-  
-
+  const [selectedItemsArray, setSelectedItemsArray] = useState([]);
 
   useEffect(() => {
     dispatch(fetchList());
-  },[dispatch]);
+  }, [dispatch]);
 
+  const { list } = useSelector((state) => state.list);
 
-
-  const { list } = useSelector((state) => state.list)
-
-  //seçilenleri arrayde tut 
-  const handleCheckBox = (id,isChecked) => {
-    if(isChecked){
-      setSelectedItemsArray(selectedItemsArray => [...selectedItemsArray,id])
-      console.log('seçilen id:' ,id)
-    }else{ //seçili değilse arrayden çıkar
-      setSelectedItemsArray(selectedItemsArray.filter((item) => item !== id))
+  //seçilenleri arrayde tut
+  const handleCheckBox = (id, isChecked) => {
+    if (isChecked) {
+      setSelectedItemsArray((selectedItemsArray) => [
+        ...selectedItemsArray,
+        id,
+      ]);
+    } else {
+      //seçili değilse arrayden çıkar
+      setSelectedItemsArray(selectedItemsArray.filter((item) => item !== id));
     }
-  }
+  };
 
   //seçilenleri array e atıyor mu diye kontrol et  console da göster
   useEffect(() => {
-    console.log('selectedItemsArray:',selectedItemsArray)
-  }
-  ,[selectedItemsArray]) 
+    console.log("selectedItemsArray:", selectedItemsArray);
+  }, [selectedItemsArray]);
 
- 
-//tümünü seç
+  //tümünü seç
   const handleAllCheck = () => {
-    if (selectedItemsArray.length === list.length) { 
+    if (selectedItemsArray.length === list.length) {
       setSelectedItemsArray([]); // Hepsi seçiliyse, sıfırla
     } else {
-      setSelectedItemsArray(list.map(item => item.id)); // Tümünü seç
+      setSelectedItemsArray(list.map((item) => item.id)); // Tümünü seç
     }
-  }
-
-
-  
-
-
-
-
-
+  };
 
   return (
-    <div className='container'>
-      <h2 className='title1'>TODOLİST</h2>
+    <div className="container">
+      <h2 className="title1">TODOLİST</h2>
 
       {selectedItemsArray.length > 0 && (
-      <div style={{display:'flex',justifyContent:'space-between'}}>
-      <AllCheckButton handleAllCheck={handleAllCheck}/>
-      <SelectedDelete selectedItemsArray={selectedItemsArray} id={list.id}/>
-      </div>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <AllCheckButton handleAllCheck={handleAllCheck} />
+          <SelectedDelete
+            selectedItemsArray={selectedItemsArray}
+            id={list.id}
+            notify={notify}
+          />
+        </div>
       )}
-     
-      <div className='addContainer'>
-        <Input/>
-      </div>
-      
-      <div > 
-      {list.length === 0 ? (
-            <p>Liste boş. Görev ekleyin!</p>
-        ) : (
-            <List selectedItemsArray={selectedItemsArray} handleCheckBox={handleCheckBox} />
-        )}
 
+      <div className="addContainer">
+        <Input notify={notify} />
+      </div>
+
+      <div>
+        {list.length === 0 ? (
+          <p>Liste boş. Görev ekleyin!</p>
+        ) : (
+          <List
+            selectedItemsArray={selectedItemsArray}
+            handleCheckBox={handleCheckBox}
+            notify={notify}
+          />
+        )}
       </div>
       <div>
-        <Logout onLogout={onLogout}/>
+        <Logout onLogout={onLogout} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default IndexPage
+export default IndexPage;

@@ -1,33 +1,30 @@
-import React from 'react'
-import { useState } from 'react'
-import api from '../../api/api';
-import { fetchList } from '../../redux/features/list-slice';
-import { useDispatch } from 'react-redux';
-import AddButton from '../button/AddButton';
+import React from "react";
+import { useState } from "react";
+import api from "../../api/api";
+import { fetchList } from "../../redux/features/list-slice";
+import { useDispatch } from "react-redux";
+import AddButton from "../button/AddButton";
+import "./index.css";
 
-const Input = () => {
-  const [inputValue, setInputValue] = useState('');
+const Input = ({ notify }) => {
+  const [inputValue, setInputValue] = useState("");
 
   const handleInput = (e) => {
     setInputValue(e.target.value); //input a girilen değeri alır.
-  }
-
-  
-
+  };
 
   return (
-    <div>
-    <input 
-    className='input' 
-    placeholder='Listeye bir görev ekleyin'
-    value={inputValue} // value olarak input a girilen değeri alır.
-    onChange={handleInput} //değişim olduğunda handleInput fonksiyonunu çalıştırır.
-    />
-    
-    
-    <AddButton buttonName="ekle" inputValue={inputValue} /> 
-    </div>
-  )
-}
+    <div className="input-container">
+      <input
+        className="input"
+        placeholder="Listeye bir görev ekleyin"
+        value={inputValue} // value olarak input a girilen değeri alır.
+        onChange={handleInput} //değişim olduğunda handleInput fonksiyonunu çalıştırır.
+      />
 
-export default Input
+      <AddButton inputValue={inputValue} notify={notify} />
+    </div>
+  );
+};
+
+export default Input;

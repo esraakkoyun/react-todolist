@@ -19,10 +19,7 @@ class API {
       }
     );
   }
-  getSaklabanlık(){
-    console.log("Polat SSB Crudfab")
-  }
-  
+
 
   getHeaders() {   
     const token = localStorage.getItem("token"); // Token'ı localStorage'dan al
@@ -38,7 +35,6 @@ class API {
 
   //veri eklemek için - kullanıcıya göre ekleme yapıyorux
   addItem(newTask){
-    console.log("api addITem:",newTask)
      return axios.post(`${this.url}/addtasks`,{title:newTask},this.getHeaders()) 
   }
    // görev verilerini getirmek için
@@ -47,16 +43,12 @@ class API {
   }
 
   //veri silmek için
-  deleteItem(id){
-    console.log(id)
-    //{id:5}
-    //5
-    return axios.delete(`${this.url}/deletetasks/${id}`,this.getHeaders()) 
+  deleteItem(selectedItemsArray){
+    return axios.delete(`${this.url}/deletetasks`,{ data: { task_ids: selectedItemsArray }, ...this.getHeaders()}) 
   }
 
   //veri güncellemek için
   updateItem(id,text){
- 
     return axios.put(`${this.url}/updatetasks/${id}`,{title:text},this.getHeaders())
   }
 
@@ -75,6 +67,10 @@ class API {
       return axios.get(`${this.url}/getUserById`, this.getHeaders());
     }  
   
+    // Kullanıcı çıkışı
+    user_logout() {
+      return axios.post(`${this.url}/logout`,{}, this.getHeaders());
+    }
 
  
   

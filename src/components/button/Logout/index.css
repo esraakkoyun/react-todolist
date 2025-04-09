@@ -1,0 +1,15 @@
+.logoutButton {
+    background-color: #f44336; /* Kırmızı arka plan */
+    color: white; /* Beyaz metin */
+    border: none; /* Kenar yok */
+    padding: 10px 15px; /* İç boşluk */
+    font-size: 14px; /* Font boyutu */
+    border-radius: 5px; /* Kenar yuvarlama */
+    cursor: pointer; /* İmleç değişimi */
+    transition: background-color 0.3s; /* Geçiş efekti */
+    margin-top: 10px;
+}
+
+.logoutButton:hover {
+    background-color: #d32f2f; /* Hover durumunda arka plan rengi */
+}

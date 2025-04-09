@@ -1,0 +1,16 @@
+.addButton {
+    background-color: #4CAF50; /* Yeşil arka plan */
+    color: white; /* Beyaz yazı rengi */
+    border: none; /* Kenar yok */
+    border-radius: 5px; /* Kenar yuvarlama */
+    font-size: 1rem; /* Font boyutu */
+}
+
+.addButton:hover {
+    background-color: #45a049; /* Hover durumunda daha koyu yeşil */
+    transform: scale(1.05); /* Hover durumunda butonu büyüt */
+}
+
+.addButton:active {
+    transform: scale(0.95); /* Butona tıklandığında küçülme efekti */
+}

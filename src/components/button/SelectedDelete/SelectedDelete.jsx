@@ -1,40 +1,51 @@
-import React from 'react'
-import api from '../../../api/api'
-import { useDispatch , useSelector} from 'react-redux'
-import { fetchList } from '../../../redux/features/list-slice'
+import React, { useState } from "react";
+import api from "../../../api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchList } from "../../../redux/features/list-slice";
+import "./index.css";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const SelectedDelete = ({selectedItemsArray}) => {
-  const dispatch = useDispatch()
+const SelectedDelete = ({ selectedItemsArray }) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteSelected = () => {
-    selectedItemsArray.map((id) =>
-      api.deleteItem(id).then((response)=>{
-          console.log(response)
-          dispatch(fetchList())
-        })
-    )
-    console.log('Seçili olanlar silindi')
-  }
+    setIsLoading(true);
+    const pendingToast = toast.info("Siliniyor...");
 
-
-
+    api
+      .deleteItem(selectedItemsArray)
+      .then((response) => {
+        if (response.status === 200) {
+          dispatch(fetchList());
+          toast.update(pendingToast, {
+            render: "Seçili olanlar silindi",
+            type: "success",
+          });
+        } else {
+          toast.update(pendingToast, {
+            render: "Seçili olanlar silinemedi",
+            type: "error",
+          });
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <div>
-         <button  className="deleteSelectedButton" style={styles.button} onClick={handleDeleteSelected}>Seçili olanları sil</button>
+      <button
+        className="deleteSelectedButton"
+        onClick={handleDeleteSelected}
+        disabled={isLoading}
+      >
+        {isLoading ? "Siliniyor..." : "Seçili olanları sil"}
+      </button>
     </div>
-  )
-}
+  );
+};
 
-const styles = {
-  button: {
-    backgroundColor: 'red',
-    color: 'white',
-    border: '2px solid',
-    padding: '10px 15px',
-    display: 'block',
-    fontSize: '10px',
-    marginRight: '10px',  
-  }
-}
-export default SelectedDelete
+export default SelectedDelete;

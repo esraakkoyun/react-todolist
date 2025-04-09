@@ -1,0 +1,34 @@
+.login-input {
+    width: 60%; /* Genişlik */
+    padding: 10px; /* İç boşluk */
+    margin: 10px; /* Üst ve alt boşluk */
+    border: 1px solid #ccc; /* Kenar rengi */
+    border-radius: 5px; /* Kenar yuvarlama */
+    background-color: #f0f0f0;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+}
+
+.login-button {
+    background-color: rgb(41, 136, 167); /* Buton arka plan rengi */
+    color: white; /* Buton metin rengi */
+    border: none; /* Kenar yok */
+    padding: 10px; /* İç boşluk */
+    font-size: 14px; /* Font boyutu */
+    border-radius: 5px; /* Kenar yuvarlama */
+    cursor: pointer; /* İmleç değişimi */
+   
+}
+
+.login-button:hover {
+    background-color: rgb(31, 116, 137); /* Hover durumunda arka plan rengi */
+}
+
+.login-title{
+    color: #0b515d;
+    font-size: 45px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+

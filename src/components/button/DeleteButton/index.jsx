@@ -1,32 +1,52 @@
-import React from 'react'
-import './index.css'
-import { useDispatch, useSelector } from 'react-redux'
-import  {deleteList}  from '../../../redux/features/delete-slice'
-import { useEffect } from 'react'
-import api from '../../../api/api'
-import { fetchList } from '../../../redux/features/list-slice'
+import React, { useState } from "react";
+import "./index.css";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import api from "../../../api/api";
+import { fetchList } from "../../../redux/features/list-slice";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const DeleteButton = ({id}) => {  
-  const dispatch = useDispatch() 
+const DeleteButton = ({ id, notify }) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = () => {
-    api.deleteItem(id).then((response)=>{
-      console.log(response)
-      dispatch(fetchList())
-    })
-    console.log('delete button index.jsx id:',id)
-  }
+    setIsLoading(true);
+    const idsToDelete = [id];
 
-  const {list} = useSelector((state) => state.list) // veri çekmek için
-  
+    api
+      .deleteItem(idsToDelete)
+      .then((response) => {
+        if (response.status === 200) {
+          dispatch(fetchList());
+          notify("success", "Başarıyla silindi!");
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+          notify("error", "Silme işlemi başarısız oldu!");
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const { list } = useSelector((state) => state.list); // veri çekmek için
 
   return (
     <div>
-       {list?.length > 0 && (
-        <button className='deleteButton' onClick={()=>handleDelete()}>Delete</button>
-          )}
+      {list?.length > 0 && (
+        <button
+          className="deleteButton"
+          onClick={() => handleDelete()}
+          disabled={isLoading}
+        >
+          {isLoading ? "Siliniyor..." : "Delete"}
+        </button>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default DeleteButton
+export default DeleteButton;

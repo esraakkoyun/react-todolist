@@ -1,0 +1,25 @@
+.input-container {
+    display: flex; /* Flexbox kullanarak iç elemanları yan yana hizala */
+    align-items: center; /* Dikey olarak ortala */
+    justify-content: space-between; /* Elemanlar arasında boşluk bırak */
+    margin: 10px 0; /* Üst ve alt boşluk */
+    padding: 10px; /* İç boşluk */
+    border: 1px solid #ccc; /* Kenar rengi */
+    border-radius: 5px; /* Kenar yuvarlama */
+    background-color: #f9f9f9; /* Arka plan rengi */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Gölgelendirme */
+}
+
+.input {
+    border: none; /* Kenar yok */
+    outline: none; /* Odaklanma çerçevesi yok */
+    flex: 1; /* Genişliği doldur */
+    padding: 10px; /* İç boşluk */
+    font-size: 1rem; /* Font boyutu */
+    border-radius: 5px; /* Kenar yuvarlama */
+    margin-right: 10px; /* Buton ile arada boşluk */
+}
+
+.input::placeholder {
+    color: #aaa; /* Placeholder rengi */
+}

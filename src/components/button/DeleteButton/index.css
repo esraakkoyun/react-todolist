@@ -6,3 +6,7 @@
     margin: 0px 5px;
     font-size: 10px;
 }
+
+.deleteButton:hover {
+    background-color: #d32f2f; /* Hover efekti */
+  }

@@ -7,6 +7,8 @@ import jwt
 import datetime
 import os
 import json
+from fastapi import Body
+from typing import List
 
 # Gizli anahtar
 SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
@@ -14,6 +16,24 @@ SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
 # Veritabanı bağlantısı
 DATABASE_URL = "postgresql://postgres:esrA727@localhost:5432/todolist_db"
 database = Database(DATABASE_URL)
+
+
+# OAuth2PasswordBearer ile token doğrulaması
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+# Token doğrulama fonksiyonu
+def get_user_id_from_token(token: str = Depends(oauth2_scheme)):
+    if token in blacklist:  # Eğer token blacklist'te ise
+        raise HTTPException(status_code=401, detail="Token geçersiz")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload.get("user_id")
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return user_id
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+ 
 
 app = FastAPI()
 
@@ -41,6 +61,8 @@ class TaskRequest(BaseModel):
 class UpdateTaskRequest(BaseModel):
     title: str
 
+class DeleteTasksRequest(BaseModel):
+    task_ids: List[int]
 # Lifespan yöneticisi
 @app.on_event("startup")
 async def startup():
@@ -137,6 +159,18 @@ def get_user_id_from_token(token: str = Depends(oauth2_scheme)):
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+
+
+blacklist = set()
+@app.post("/logout")
+async def logout(token: str = Depends(oauth2_scheme)):
+    #token silme işlemi
+
+    blacklist.add(token)
+    return {"message": "Çıkış yapıldı"}
+
+
+
 # Kullanıcıya ait görevleri almak
 @app.get("/gettasks")
 async def get_tasks(user_id: int = Depends(get_user_id_from_token)):
@@ -206,8 +240,10 @@ async def update_task(task_id: int, updated_task: dict, user_id: int = Depends(g
 
 
 # Görevi silme
-@app.delete("/deletetasks/{task_id}")
-async def delete_task(task_id: int, user_id: int = Depends(get_user_id_from_token)):
+@app.delete("/deletetasks")
+async def delete_task(delete_request: DeleteTasksRequest, user_id: int = Depends(get_user_id_from_token)):
+    print("delete_request.task_ids:",delete_request.task_ids)
+
     query = "SELECT todolist FROM users WHERE id = :user_id"
     user = await database.fetch_one(query=query, values={"user_id": user_id})
 
@@ -216,13 +252,13 @@ async def delete_task(task_id: int, user_id: int = Depends(get_user_id_from_toke
 
     todolist = json.loads(user["todolist"]) if user["todolist"] else []
 
-    # ID'ye göre görevi sil
-    todolist = [task for task in todolist if task["id"] != task_id]
+    # Silinecek ID'leri filtrele
+    todolist = [task for task in todolist if task["id"] not in delete_request.task_ids]
 
     update_query = "UPDATE users SET todolist = :todolist WHERE id = :user_id"
     await database.execute(query=update_query, values={"todolist": json.dumps(todolist), "user_id": user_id})
 
-    return {"message": "Görev silindi", "todolist": todolist}
+    return {"message": "Görevler silindi", "todolist": todolist}
 
 
 
