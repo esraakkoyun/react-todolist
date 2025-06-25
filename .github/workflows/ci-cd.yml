@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline Todolist
 
 on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
   push:
