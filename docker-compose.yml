@@ -1,0 +1,47 @@
+version: '3'
+services: # burada birden fazla container tanımlayabiliriz. uygulamada tanımlı servisleri belirtir.
+  # frontend container'ı
+  frontend:
+    container_name: todolist-frontend 
+    build:                     # frontend container'ı için Dockerfile'ı kullanıyoruz.
+      context: .               # context: ./frontend  # frontend klasöründeki Dockerfile'ı kullanıyoruz demektir . dockerfile ın yolunu belirtir. biz aynı satırda olduğu için . koyduk 
+      dockerfile: Dockerfile   
+    ports:                     #Dış dünyadan localhost:5173 üzerinden bu konteynere erişebiliriz
+      - "5173:5173"
+    environment:               # react uygulaması backend api yi çağırmak için bu url i kullanacak
+      - VITE_API_URL=http://localhost:8000
+    depends_on:                # frontend container'ı backend container'ına bağlıdır. backend çalışmadan frontend çalışmaz.
+      - backend
+
+  backend:
+    container_name: todolist-backend
+    build: 
+      context: ./backend # backend klasöründeki Dockerfile'ı kullanıyoruz demektir.
+      dockerfile: Dockerfile
+    ports:           # dış dünyadan localhost:8000 üzerinden bu konteynere erişebiliriz
+      - "8000:8000"
+    environment:          # FastAPI bu bağlantı adresini kullanarak veritabanına bağlanacak. Burada dikkat: host kısmı localhost değil, db çünkü o servisin adı bu.
+      - DATABASE_URL=postgresql://postgres:esrA727@db:5432/todolist_db  #db olacak dikkat et main.py de de değiştirdik.
+    depends_on:
+      db:
+        condition: service_healthy  #Backend servisi, veritabanı tamamen hazır olmadan başlamaz. db ye bağlıdır
+
+  db:
+    container_name: todolist-db
+    image: postgres:13 # PostgreSQL 13 image'ını kullanıyoruz. Bu image, PostgreSQL veritabanını çalıştırmak için gerekli olan tüm bileşenleri içerir.
+    environment: # otomatik olarak veritabanı oluşturmak için gerekli olan kullanıcı adı, şifre ve veritabanı adı bilgileri
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=esrA727
+      - POSTGRES_DB=todolist_db # veritabanı adı
+    ports: 
+      - "5432:5432"
+    volumes: # veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
+      - postgres_data:/var/lib/postgresql/data # Container içindeki klasör (PostgreSQL'in verileri tuttuğu yer) burası 
+    healthcheck:      #  PostgreSQL servisi hazır mı diye kontrol eder.Hazır değilse diğer servisler başlamaz.
+      test: ["CMD-SHELL", "pg_isready -U postgres -d todolist_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes: #volumes isimleri burada tanımlanır. veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
+  postgres_data:

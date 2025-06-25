@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
+  push:
+    branches: [ main ]
+
+jobs:                        # Bu bölümdeki her bir job, paralel olarak çalışacak. Yani bu job'lar birbirinden bağımsız.
+  build:
+    runs-on: ubuntu-latest 
+
+    steps:
+
+    - name: Repodan kodları çek
+      uses: actions/checkout@v3
+
+    - name: Node ORtamı hazırla 
+      uses: actions/setup-node@v3
+
+    - name: Python ORtamı hazırla 
+      uses: actions/setup-python@v4
+    
+
+    - name: Bağımlılıkları yükle
+      run: npm install  &&  pip install -r requirements.txt
+
+    - name: Uygulamayı build et
+      run: npm run build
+
+  frontend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Repodan kodları çek
+        uses: actions/checkout@v3
+
+      - name: ORtamı hazırla 
+        uses: actions/setup-node@v3
+
+      - name: Bağımlılıkları yükle
+        run: npm install
+
+      - name: Uygulamayı test et
+        run: npm test
+
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repodan kodları çek
+        uses: actions/checkout@v3
+
+      - name: ORtamı hazırla 
+        uses: actions/setup-python@v4
+
+      - name: Bağımlılıkları yükle
+        run: pip install -r requirements.txt
+
+      - name: Uygulamayı test et
+        run: pytest backend/

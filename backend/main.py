@@ -14,7 +14,7 @@ from typing import List
 SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
 
 # Veritabanı bağlantısı
-DATABASE_URL = "postgresql://postgres:esrA727@localhost:5432/todolist_db"
+DATABASE_URL = "postgresql://postgres:esrA727@db:5432/todolist_db"
 database = Database(DATABASE_URL)
 
 
