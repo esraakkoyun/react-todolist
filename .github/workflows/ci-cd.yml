@@ -23,7 +23,7 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
     
 
     - name: Bağımlılıkları yükle
-      run: npm install --legacy-peer-deps &&  pip install -r requirements.txt
+      run: npm install --legacy-peer-deps &&  pip install -r backend/requirements.txt
 
     - name: Uygulamayı build et
       run: npm run build
@@ -54,7 +54,9 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
         uses: actions/setup-python@v4
 
       - name: Bağımlılıkları yükle
-        run: pip install -r backend/requirements.txt
+        run: | 
+              pip install -r backend/requirements.txt
+              pip install pytest
 
       - name: Uygulamayı test et
         run: pytest backend/
