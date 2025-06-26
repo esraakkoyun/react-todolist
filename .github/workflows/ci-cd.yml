@@ -2,7 +2,7 @@ name: CI/CD Pipeline Todolist
 
 on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
   push:
-    branches: [ main ]
+    branches: [ esra ]
 
 jobs:                        # Bu bölümdeki her bir job, paralel olarak çalışacak. Yani bu job'lar birbirinden bağımsız.
   build:
