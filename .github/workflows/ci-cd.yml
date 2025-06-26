@@ -1,3 +1,5 @@
+
+
 name: CI/CD Pipeline Todolist
 
 on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
@@ -21,7 +23,7 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
     
 
     - name: Bağımlılıkları yükle
-      run: npm install  &&  pip install -r requirements.txt
+      run: npm install --legacy-peer-deps &&  pip install -r requirements.txt
 
     - name: Uygulamayı build et
       run: npm run build
@@ -37,7 +39,7 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
         uses: actions/setup-node@v3
 
       - name: Bağımlılıkları yükle
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Uygulamayı test et
         run: npm test
@@ -52,7 +54,8 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
         uses: actions/setup-python@v4
 
       - name: Bağımlılıkları yükle
-        run: pip install -r requirements.txt
+        run: pip install -r backend/requirements.txt
 
       - name: Uygulamayı test et
         run: pytest backend/
+
