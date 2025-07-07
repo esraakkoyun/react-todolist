@@ -1,4 +1,4 @@
-version: '3'
+
 services: # burada birden fazla container tanımlayabiliriz. uygulamada tanımlı servisleri belirtir.
   # frontend container'ı
   frontend:
@@ -22,6 +22,8 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
       - "8000:8000"
     environment:          # FastAPI bu bağlantı adresini kullanarak veritabanına bağlanacak. Burada dikkat: host kısmı localhost değil, db çünkü o servisin adı bu.
       - DATABASE_URL=postgresql://postgres:esrA727@db:5432/todolist_db  #db olacak dikkat et main.py de de değiştirdik.
+    volumes:
+    - ./logs:/logs
     depends_on:
       db:
         condition: service_healthy  #Backend servisi, veritabanı tamamen hazır olmadan başlamaz. db ye bağlıdır
@@ -42,6 +44,44 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
       interval: 10s
       timeout: 5s
       retries: 5
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.17.18
+    container_name: todolist-filebeat
+    volumes:
+      - ./logs:/logs:ro                  # Log dosyalarını oku
+      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # Konfigürasyon
+    depends_on:
+      - logstash
+
+
+
+  elasticsearch:
+    container_name: todolist-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
+    environment:
+      - discovery.type=single-node # Elasticsearch tek düğümlü modda çalışacak.
+      - xpack.security.enabled=false # Güvenlik özelliklerini devre dışı bırakıyoruz.
+    ports:
+      - "9200:9200" # Elasticsearch'e dış dünyadan erişim için port ayarı.
+
+  logstash:
+    container_name: todolist-logstash
+    image: docker.elastic.co/logstash/logstash:7.17.18
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logs:/logs
+    ports:
+      - "5044:5044" # Logstash'a dış dünyadan erişim için
+    depends_on:
+      - elasticsearch # Logstash, Elasticsearch servisine bağlıdır. Elasticsearch başlamadan Logstash başlamaz.
+  kibana:
+    container_name: todolist-kibana
+    image: docker.elastic.co/kibana/kibana:7.17.18
+    ports:
+      - "5601:5601" # Kibana'ya dış dünyadan erişim için port ayarı.
+    depends_on:
+      - elasticsearch # Kibana, Elasticsearch servisine bağlıdır. Elasticsearch başlamadan Kibana başlamaz.
 
 volumes: #volumes isimleri burada tanımlanır. veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
   postgres_data:

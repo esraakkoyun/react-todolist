@@ -1,19 +1,15 @@
-
-
-name: CI/CD Pipeline Todolist
-
+name: CI/CD Pipeline   #Bu pipeline'ın ismi. GitHub Actions arayüzünde bu isimle görünecek.
 on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
   push:
     branches: [ esra ]
 
 jobs:                        # Bu bölümdeki her bir job, paralel olarak çalışacak. Yani bu job'lar birbirinden bağımsız.
   build:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest   # Bu job'ın hangi işletim sisteminde  çalışacağını belirtiyor. Burada en son sürüm Ubuntu kullanılıyor.
 
-    steps:
-
-    - name: Repodan kodları çek
-      uses: actions/checkout@v3
+    steps:                   # Bu job'ın adımları. Her bir step, sırasıyla çalışacak.
+    - name: Kodu checkout et  # Bu adımmda github, repository'deki kodu alacak. dosyalar github actions'a kopyalanacak.
+      uses: actions/checkout@v3 # checkout@v3 githubın resmi hazır eklentisidr.GitHub deposundaki kodları, GitHub Actions’ın geçici sanal makinesine (runner) indirir.
 
     - name: Node ORtamı hazırla 
       uses: actions/setup-node@v3
@@ -25,14 +21,14 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
     - name: Bağımlılıkları yükle
       run: npm install --legacy-peer-deps &&  pip install -r backend/requirements.txt
 
-    - name: Uygulamayı build et
-      run: npm run build
+    - name: Docker image build et.
+      run: docker build -t Todolist:latest .
 
   frontend-test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Repodan kodları çek
+      - name: Kodu checkout et
         uses: actions/checkout@v3
 
       - name: ORtamı hazırla 
@@ -42,12 +38,12 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
         run: npm install --legacy-peer-deps
 
       - name: Uygulamayı test et
-        run: npm test
+        run: docker run --rm Todolist:latest npm test
 
   backend-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Repodan kodları çek
+      - name: Kodu checkout et
         uses: actions/checkout@v3
 
       - name: ORtamı hazırla 
@@ -56,8 +52,120 @@ jobs:                        # Bu bölümdeki her bir job, paralel olarak çalı
       - name: Bağımlılıkları yükle
         run: | 
               pip install -r backend/requirements.txt
-              pip install pytest
+              pip install pytest 
 
       - name: Uygulamayı test et
-        run: pytest backend/
+        run: docker run --rm Todolist:latest pytest backend/
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, frontend-test, backend-test]  # Bu job, build, frontend-test ve backend-test job'larının tamamlanmasını bekleyecek.
+
+    steps:
+      - name: Kodu checkout et
+        uses: actions/checkout@v3
+
+      - name: Docker Hub'a login ol
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        run: echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+
+      - name: Docker image'ı push et
+        run: |
+          docker tag Todolist:latest ${{ secrets.DOCKER_USER }}/Todolist:latest
+          docker push ${{ secrets.DOCKER_USER }}/Todolist:latest
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# name: CI/CD Pipeline Todolist
+
+# on:                             #Bu pipeline ne zaman çalışacak onu belirtiyor. main adlı dala (branch) herhangi bir push yapıldığında bu işlemleri başlat.
+#   push:
+#     branches: [ esra ]
+
+# jobs:                        # Bu bölümdeki her bir job, paralel olarak çalışacak. Yani bu job'lar birbirinden bağımsız.
+#   build:
+#     runs-on: ubuntu-latest 
+
+#     steps:
+
+#     - name: Repodan kodları çek
+#       uses: actions/checkout@v3
+
+#     - name: Node ORtamı hazırla 
+#       uses: actions/setup-node@v3
+
+#     - name: Python ORtamı hazırla 
+#       uses: actions/setup-python@v4
+    
+
+#     - name: Bağımlılıkları yükle
+#       run: npm install --legacy-peer-deps &&  pip install -r backend/requirements.txt
+
+#     - name: Uygulamayı build et
+#       run: npm run build
+
+#   frontend-test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Repodan kodları çek
+#         uses: actions/checkout@v3
+
+#       - name: ORtamı hazırla 
+#         uses: actions/setup-node@v3
+
+#       - name: Bağımlılıkları yükle
+#         run: npm install --legacy-peer-deps
+
+#       - name: Uygulamayı test et
+#         run: npm test
+
+#   backend-test:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Repodan kodları çek
+#         uses: actions/checkout@v3
+
+#       - name: ORtamı hazırla 
+#         uses: actions/setup-python@v4
+
+#       - name: Bağımlılıkları yükle
+#         run: | 
+#               pip install -r backend/requirements.txt
+#               pip install pytest 
+
+#       - name: Uygulamayı test et
+#         run: pytest backend/

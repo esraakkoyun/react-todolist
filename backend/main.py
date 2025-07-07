@@ -9,6 +9,7 @@ import os
 import json
 from fastapi import Body
 from typing import List
+import logging
 
 # Gizli anahtar
 SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
@@ -276,3 +277,15 @@ async def get_user_by_id(user_id: int = Depends(get_user_id_from_token)):
         "username": user["username"],
         "todolist": json.loads(user["todolist"])  # Kullanıcının todolist'ini döndür
     }
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    filename='/logs/app.log',  # Log dosyasının yolu
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+@app.get("/")
+def home():
+    logging.info("Ana sayfa istendi.")
+    return {"message": "Merhaba ELK Stack!"}

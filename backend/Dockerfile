@@ -10,6 +10,7 @@ COPY requirements.txt .
 
 #bağımlılıkları yükler.
 RUN pip install -r requirements.txt
+RUN mkdir /logs
 
 # uygulama dosyalarını kopyalar. ilk nokta bilgisayardaki klasörümüzü, ikinci nokta konteynerin içindeki app klasörü
 COPY . .
