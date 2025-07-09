@@ -11,6 +11,13 @@ from fastapi import Body
 from typing import List
 import logging
 
+logging.basicConfig(
+    level=logging.INFO,
+    filename='/logs/app.log',  # Log dosyasının yolu
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+
 # Gizli anahtar
 SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key")
 
@@ -63,7 +70,7 @@ class UpdateTaskRequest(BaseModel):
     title: str
 
 class DeleteTasksRequest(BaseModel):
-    task_ids: List[int]
+    task_ids: List[int] 
 # Lifespan yöneticisi
 @app.on_event("startup")
 async def startup():
@@ -96,6 +103,7 @@ async def test_db():
 # Kullanıcı kaydı
 @app.post("/register")
 async def register(user: User):
+    logging.info(f"Kayıt isteği alındı: {user.username}") 
     # Kullanıcı adı kontrolü
     existing_user = await database.fetch_one(
         "SELECT * FROM users WHERE username = :username",
@@ -129,6 +137,7 @@ async def register(user: User):
 # Kullanıcı girişi
 @app.post("/login")
 async def login(data: LoginRequest):
+    logging.info(f"Giriş isteği alındı: {data.username}")
     query = "SELECT * FROM users WHERE username = :username AND password = :password;"
     user = await database.fetch_one(query=query, values={"username": data.username, "password": data.password})
     
@@ -165,6 +174,7 @@ def get_user_id_from_token(token: str = Depends(oauth2_scheme)):
 blacklist = set()
 @app.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
+    
     #token silme işlemi
 
     blacklist.add(token)
@@ -175,6 +185,7 @@ async def logout(token: str = Depends(oauth2_scheme)):
 # Kullanıcıya ait görevleri almak
 @app.get("/gettasks")
 async def get_tasks(user_id: int = Depends(get_user_id_from_token)):
+    
     query = "SELECT todolist FROM users WHERE id = :user_id"
     user = await database.fetch_one(query=query, values={"user_id": user_id})
 
@@ -189,6 +200,7 @@ async def get_tasks(user_id: int = Depends(get_user_id_from_token)):
 
 @app.post("/addtasks")
 async def add_task(task: TaskRequest, user_id: int = Depends(get_user_id_from_token)):
+    logging.info(f"Kullanıcı {user_id} yeni görev ekliyor: {task.title}")
     # Mevcut todolist'i al
     query = "SELECT todolist FROM users WHERE id = :user_id"
     user = await database.fetch_one(query=query, values={"user_id": user_id})
@@ -218,6 +230,8 @@ async def add_task(task: TaskRequest, user_id: int = Depends(get_user_id_from_to
 # Görevi güncelleme
 @app.put("/updatetasks/{task_id}")
 async def update_task(task_id: int, updated_task: dict, user_id: int = Depends(get_user_id_from_token)):
+    logging.info(f"Kullanıcı {user_id} görevi güncelliyor: ID={task_id}, yeni başlık: {updated_task['title']}")
+
     query = "SELECT todolist FROM users WHERE id = :user_id"
     user = await database.fetch_one(query=query, values={"user_id": user_id})
 
@@ -243,6 +257,8 @@ async def update_task(task_id: int, updated_task: dict, user_id: int = Depends(g
 # Görevi silme
 @app.delete("/deletetasks")
 async def delete_task(delete_request: DeleteTasksRequest, user_id: int = Depends(get_user_id_from_token)):
+    logging.info(f"Kullanıcı {user_id} şu görevleri siliyor: {delete_request.task_ids}")
+
     print("delete_request.task_ids:",delete_request.task_ids)
 
     query = "SELECT todolist FROM users WHERE id = :user_id"
@@ -279,13 +295,4 @@ async def get_user_by_id(user_id: int = Depends(get_user_id_from_token)):
     }
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    filename='/logs/app.log',  # Log dosyasının yolu
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
 
-@app.get("/")
-def home():
-    logging.info("Ana sayfa istendi.")
-    return {"message": "Merhaba ELK Stack!"}

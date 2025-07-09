@@ -2,34 +2,38 @@
 services: # burada birden fazla container tanımlayabiliriz. uygulamada tanımlı servisleri belirtir.
   # frontend container'ı
   frontend:
-    container_name: todolist-frontend 
-    build:                     # frontend container'ı için Dockerfile'ı kullanıyoruz.
-      context: .               # context: ./frontend  # frontend klasöründeki Dockerfile'ı kullanıyoruz demektir . dockerfile ın yolunu belirtir. biz aynı satırda olduğu için . koyduk 
-      dockerfile: Dockerfile   
+    image: esra/todolist-frontend:latest # frontend için oluşturduğumuz imajı kullanıyoruz. Bu imaj, Dockerfile ile oluşturulmuş olmalı.
+   # build:                     # frontend container'ı için Dockerfile'ı kullanıyoruz.
+   #   context: .               # context: ./frontend  # frontend klasöründeki Dockerfile'ı kullanıyoruz demektir . dockerfile ın yolunu belirtir. biz aynı satırda olduğu için . koyduk 
+   #   dockerfile: Dockerfile       bu kısım swarm kullanılmazsa olur ama swarm kullanılırsa container name ve build kısmı olmaz oluşturulan imajı build edeceksin elle sonra buraya image olarak yazıcaksın 
+    deploy:
+      replicas: 1
     ports:                     #Dış dünyadan localhost:5173 üzerinden bu konteynere erişebiliriz
       - "5173:5173"
     environment:               # react uygulaması backend api yi çağırmak için bu url i kullanacak
       - VITE_API_URL=http://localhost:8000
-    depends_on:                # frontend container'ı backend container'ına bağlıdır. backend çalışmadan frontend çalışmaz.
-      - backend
+  
+    networks:
+      - appnet
+
 
   backend:
-    container_name: todolist-backend
-    build: 
-      context: ./backend # backend klasöründeki Dockerfile'ı kullanıyoruz demektir.
-      dockerfile: Dockerfile
+    image: esra/todolist-backend:latest # backend için oluşturduğumuz imajı kullanıyoruz. Bu imaj, Dockerfile ile oluşturulmuş olmalı.
+    # build:                     # backend container'ı için Dockerfile'ı kullanıyoruz.  
+    #   context: ./backend       # context: ./backend  # backend klasöründeki Dockerfile'ı kullanıyoruz demektir. dockerfile ın yolunu belirtir. biz aynı satırda olduğu için . koyduk
+    #   dockerfile: Dockerfile   # bu kısım swarm kullanılmazsa olur
+    deploy:
+      replicas: 2 # backend servisi için 2 kopya oluşturuyoruz. Yük dengeleme için kullanılır.
     ports:           # dış dünyadan localhost:8000 üzerinden bu konteynere erişebiliriz
       - "8000:8000"
     environment:          # FastAPI bu bağlantı adresini kullanarak veritabanına bağlanacak. Burada dikkat: host kısmı localhost değil, db çünkü o servisin adı bu.
       - DATABASE_URL=postgresql://postgres:esrA727@db:5432/todolist_db  #db olacak dikkat et main.py de de değiştirdik.
     volumes:
     - ./logs:/logs
-    depends_on:
-      db:
-        condition: service_healthy  #Backend servisi, veritabanı tamamen hazır olmadan başlamaz. db ye bağlıdır
-
+   
+    networks:
+      - appnet    
   db:
-    container_name: todolist-db
     image: postgres:13 # PostgreSQL 13 image'ını kullanıyoruz. Bu image, PostgreSQL veritabanını çalıştırmak için gerekli olan tüm bileşenleri içerir.
     environment: # otomatik olarak veritabanı oluşturmak için gerekli olan kullanıcı adı, şifre ve veritabanı adı bilgileri
       - POSTGRES_USER=postgres
@@ -37,51 +41,51 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
       - POSTGRES_DB=todolist_db # veritabanı adı
     ports: 
       - "5432:5432"
+    deploy:
+      replicas: 1 # Veritabanı servisi için 1 kopya oluşturuyoruz. Genellikle veritabanı tek bir örnek olarak çalışır.
     volumes: # veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
       - postgres_data:/var/lib/postgresql/data # Container içindeki klasör (PostgreSQL'in verileri tuttuğu yer) burası 
-    healthcheck:      #  PostgreSQL servisi hazır mı diye kontrol eder.Hazır değilse diğer servisler başlamaz.
-      test: ["CMD-SHELL", "pg_isready -U postgres -d todolist_db"]
-      interval: 10s
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 10 # Sağlık kontrolü için PostgreSQL'in hazır olup olmadığını kontrol ediyoruz. Bu, veritabanının düzgün çalışıp çalışmadığını belirlemek için kullanılır.
+    networks:
+      - appnet # Veritabanı servisi de appnet ağına katılıyor. Bu sayede diğer servisler (backend gibi) bu veritabanına erişebilir.
 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:7.17.18
-    container_name: todolist-filebeat
-    volumes:
-      - ./logs:/logs:ro                  # Log dosyalarını oku
-      - ./filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml # Konfigürasyon
-    depends_on:
-      - logstash
-
-
-
+ 
   elasticsearch:
-    container_name: todolist-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
+    deploy:
+      replicas: 1 # Elasticsearch servisi için 1 kopya oluşturuyoruz. Genellikle Elasticsearch tek bir örnek olarak çalışır.
     environment:
       - discovery.type=single-node # Elasticsearch tek düğümlü modda çalışacak.
       - xpack.security.enabled=false # Güvenlik özelliklerini devre dışı bırakıyoruz.
     ports:
       - "9200:9200" # Elasticsearch'e dış dünyadan erişim için port ayarı.
-
+    networks:
+      - appnet # Elasticsearch servisi de appnet ağına katılıyor. Bu sayede diğer servisler (Logstash gibi) bu Elasticsearch servisine erişebilir.
   logstash:
-    container_name: todolist-logstash
     image: docker.elastic.co/logstash/logstash:7.17.18
+    deploy:
+      replicas: 1 # Logstash servisi için 1 kopya oluşturuyoruz. Genellikle Logstash tek bir örnek olarak çalışır.
     volumes:
       - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
       - ./logs:/logs
-    ports:
-      - "5044:5044" # Logstash'a dış dünyadan erişim için
-    depends_on:
-      - elasticsearch # Logstash, Elasticsearch servisine bağlıdır. Elasticsearch başlamadan Logstash başlamaz.
+    
+    networks:
+      - appnet # Logstash servisi de appnet ağına katılıyor. Bu sayede diğer servisler (Filebeat gibi) bu Logstash servisine erişebilir.
   kibana:
-    container_name: todolist-kibana
     image: docker.elastic.co/kibana/kibana:7.17.18
+    deploy:
+      replicas: 1 # Kibana servisi için 1 kopya oluşturuyoruz. Genellikle Kibana tek bir örnek olarak çalışır.
     ports:
       - "5601:5601" # Kibana'ya dış dünyadan erişim için port ayarı.
-    depends_on:
-      - elasticsearch # Kibana, Elasticsearch servisine bağlıdır. Elasticsearch başlamadan Kibana başlamaz.
-
+    networks:
+      - appnet # Kibana servisi de appnet ağına katılıyor. Bu sayede diğer servisler (Elasticsearch gibi) bu Kibana servisine erişebilir.
 volumes: #volumes isimleri burada tanımlanır. veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
   postgres_data:
+
+networks:
+  appnet:
+    driver: overlay # Overlay network, Docker Swarm modunda kullanılır. Bu sayede konteynerler farklı hostlarda bile olsa birbirleriyle iletişim kurabilirler.
