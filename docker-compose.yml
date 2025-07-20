@@ -6,7 +6,7 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
    # build:                     # frontend container'ı için Dockerfile'ı kullanıyoruz.
    #   context: .               # context: ./frontend  # frontend klasöründeki Dockerfile'ı kullanıyoruz demektir . dockerfile ın yolunu belirtir. biz aynı satırda olduğu için . koyduk 
    #   dockerfile: Dockerfile       bu kısım swarm kullanılmazsa olur ama swarm kullanılırsa container name ve build kısmı olmaz oluşturulan imajı build edeceksin elle sonra buraya image olarak yazıcaksın 
-    deploy:
+    deploy: 
       replicas: 1
     ports:                     #Dış dünyadan localhost:5173 üzerinden bu konteynere erişebiliriz
       - "5173:5173"
@@ -69,9 +69,9 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
     image: docker.elastic.co/logstash/logstash:7.17.18
     deploy:
       replicas: 1 # Logstash servisi için 1 kopya oluşturuyoruz. Genellikle Logstash tek bir örnek olarak çalışır.
-    volumes:
-      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-      - ./logs:/logs
+    volumes: 
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf  # Logstash yapılandırma dosyasını konteynere bağlıyoruz. ilk kısım host dosya yolu, ikinci kısım konteyner içindeki dosya yolu.
+      - ./logs:/logs  # Logstash, log dosyalarını bu klasörden okuyacak.
     
     networks:
       - appnet # Logstash servisi de appnet ağına katılıyor. Bu sayede diğer servisler (Filebeat gibi) bu Logstash servisine erişebilir.
@@ -81,11 +81,16 @@ services: # burada birden fazla container tanımlayabiliriz. uygulamada tanıml�
       replicas: 1 # Kibana servisi için 1 kopya oluşturuyoruz. Genellikle Kibana tek bir örnek olarak çalışır.
     ports:
       - "5601:5601" # Kibana'ya dış dünyadan erişim için port ayarı.
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200  # Kibana, Elasticsearch ile iletişim kurmak için bu adresi kullanacak.
     networks:
       - appnet # Kibana servisi de appnet ağına katılıyor. Bu sayede diğer servisler (Elasticsearch gibi) bu Kibana servisine erişebilir.
+
 volumes: #volumes isimleri burada tanımlanır. veritabanı verilerini kalıcı hale getirmek için bir volume tanımlıyoruz. Bu sayede konteyner silinse bile veritabanı verileri kaybolmaz.
   postgres_data:
+  kibana_data:
 
 networks:
   appnet:
     driver: overlay # Overlay network, Docker Swarm modunda kullanılır. Bu sayede konteynerler farklı hostlarda bile olsa birbirleriyle iletişim kurabilirler.
+                  
